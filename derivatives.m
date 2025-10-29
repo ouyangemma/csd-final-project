@@ -19,16 +19,14 @@ function derivatives = fcn(states, inputs, parameters)
     % Derivative of xi is xid
 
     % Calculative derivatives of xid
-    xidd = zeros(3,1);
-    % xidd(1)
+    xidd = [0;0;-p.g] - (p.kD/p.m)*xid + ...
+        [s_roll*s_yaw + c_roll*s_pitch*c_yaw;
+         c_roll*s_pitch*s_yaw - s_roll*c_yaw;
+         c_roll*c_pitch]*inputs(1);
 
 
     % Calculative derivatives of eta
     % Calculative derivatives of etad
-
-
-    xidd = [0;0;-parameters.g] + inputs(1)/parameters.m;
-    etadd = etad*0;
 
     derivatives = [xid; xidd; etad;etadd];
 end
