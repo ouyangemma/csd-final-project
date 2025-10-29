@@ -1,8 +1,8 @@
-function derivatives = fcn(states, inputs, parameters)
+function derivatives = fcn(states, inputs, p)
     % I is the inertia matrix
-    I = [parameters.Ixx 0 0;
-         0 parameters.Iyy 0;
-         0 0 parameters.Izz];
+    I = [p.Ixx 0 0;
+         0 p.Iyy 0;
+         0 0 p.Izz];
 
     xi= states(1:3); % x, y, z
     xid = states(4:6); %x_prime, y_prime, z_prime
@@ -43,8 +43,12 @@ function derivatives = fcn(states, inputs, parameters)
                 inputs(3);
                 inputs(4)];
     v = W * etad;
-    vd = inv(I) * (tau_body + [(parameters.Iyy - Izz)*v(2)*v(3); ... 
-                               (parameters.Izz - Ixx)*v(1)*v(3);
-                               (parameters.Ixx - Iyy)*v(1)*v(2)]);
-    derivatives = [xid; xidd; etad;vd];
+    vd = inv(I) * (tau_body + [(p.Iyy - Izz)*v(2)*v(3); ... 
+                               (p.Izz - Ixx)*v(1)*v(3);
+                               (p.Ixx - Iyy)*v(1)*v(2)]);
+    Wd = [0        0                  -etad(2)*cos(-etad(2));
+          0 -etad(1)*s_roll            etad(1)*c_roll*c_pitch;
+          0 -etad(1)*c_roll -etad(roll)*s_roll*c_pitch-etad(2)*c_roll*s_pitch];
+    etadd = inv(W) * (vd - Wd*etad);
+    derivatives = [xid; xidd; etad; etadd];
 end
