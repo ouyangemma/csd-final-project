@@ -9,4 +9,8 @@ function derivatives = fcn(states, inputs, parameters)
     etadd = etad*0;
 
     derivatives = [xid; xidd; etad;etadd];
+
+    % eta is [phi, theta, psi]
+    W = [1 0 -sin(eta[2]);
+         0 cos()]
 end
