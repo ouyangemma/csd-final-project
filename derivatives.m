@@ -1,4 +1,8 @@
 function derivatives = fcn(states, inputs, parameters)
+    % I is the inertia matrix
+    I = [parameters.Ixx 0 0;
+         0 parameters.Iyy 0;
+         0 0 parameters.Izz];
 
     xi= states(1:3); % x, y, z
     xid = states(4:6); %x_prime, y_prime, z_prime
@@ -25,8 +29,22 @@ function derivatives = fcn(states, inputs, parameters)
          c_roll*c_pitch]*inputs(1);
 
 
-    % Calculative derivatives of eta
+    % Derivative of eta is etad
     % Calculative derivatives of etad
 
-    derivatives = [xid; xidd; etad;etadd];
+
+    % eta is [phi, theta, psi] = roll pitch yaw
+    W = [1  0       -s_pitch;
+         0  c_roll  s_phi * c_pitch;
+         0 -s_roll  c_roll * c_pitch];
+    % v is rpy in body frame
+    
+    tau_body = [inputs(2);
+                inputs(3);
+                inputs(4)];
+    v = W * etad;
+    vd = inv(I) * (tau_body + [(parameters.Iyy - Izz)*v(2)*v(3); ... 
+                               (parameters.Izz - Ixx)*v(1)*v(3);
+                               (parameters.Ixx - Iyy)*v(1)*v(2)]);
+    derivatives = [xid; xidd; etad;vd];
 end
