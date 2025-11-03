@@ -1,4 +1,4 @@
-function derivatives_linearized = derive_lin(states, inputs, parameters)
+function [derivatives_lin, A, B] = derive_lin(states, inputs, p)
 
     % Angles (roll, pitch, yaw) are small, approx 0
     % sin(x) = x, cos(x) = x 
@@ -6,33 +6,48 @@ function derivatives_linearized = derive_lin(states, inputs, parameters)
     % Derivatives are zero
     % No torques (u2 to u4), but do need u1 = mg
 
+    % eta is [phi, theta, psi] = roll pitch yaw
     xi= states(1:3); % x, y, z
     xid = states(4:6); %x_prime, y_prime, z_prime
-    eta = states(7:9); % roll, pitch, yaw
+    eta = states(7:9); % roll, pitch, yaw 
     etad = states(10:12); % roll_prime, pitch_prime, yaw_prime
-
-    % Cosines of each
-    c_roll = cos(eta(1));
-    c_pitch = cos(eta(2));
-    c_yaw = cos(eta(3));
-
-    % Sines of each
-    s_roll = sin(eta(1));
-    s_pitch = sin(eta(2));
-    s_yaw = sin(eta(3));
 
 
     % Derivative of xi is xid
 
     % Calculative derivatives of xid
-    xidd = [0;0;-p.g] - (p.kD/p.m)*xid + ...
-        [s_roll*s_yaw + c_roll*s_pitch*c_yaw;
-         c_roll*s_pitch*s_yaw - s_roll*c_yaw;
-         c_roll*c_pitch]*inputs(1);
-
-
-    % Calculative derivatives of eta
+    % xidd = -(p.kD/p.m)*xid + [eta(2); -eta(1); 0]*p.g + [0;0;1]*inputs(1);
     % Calculative derivatives of etad
+    % etadd = inputs
+    A = [0 0 0   1 0 0           0 0 0   0 0 0;
+         0 0 0   0 1 0           0 0 0   0 0 0;
+         0 0 0   0 0 1           0 0 0   0 0 0;
+         0 0 0   -p.kD/p.m 0 0   0 p.g 0   0 0 0;
+         0 0 0   0 -p.kD/p.m 0   -p.g 0 0   0 0 0;
+         0 0 0   0 0 -p.kD/p.m   0 0 0   0 0 0;
+         0 0 0   0 0 0           0 0 0   1 0 0;
+         0 0 0   0 0 0           0 0 0   0 1 0;
+         0 0 0   0 0 0           0 0 0   0 0 1;
+         0 0 0   0 0 0           0 0 0   0 0 0;
+         0 0 0   0 0 0           0 0 0   0 0 0;
+         0 0 0   0 0 0           0 0 0   0 0 0];
 
-    derivatives = [xid; xidd; etad;etadd];
+    B = [0 0 0 0;
+         0 0 0 0;
+         0 0 0 0;
+
+         0 0 0 0;
+         0 0 0 0;
+         1/p.m 0 0 0;
+
+         0 0 0 0;
+         0 0 0 0;
+         0 0 0 0;
+
+         0 1/p.Ixx 0 0;
+         0 0 1/p.Iyy 0;
+         0 0 0 1/p.Izz;
+         ];
+
+    derivatives_lin = A * states + B * inputs;
 end
