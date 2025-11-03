@@ -1,4 +1,4 @@
-function derivatives = fcn(states, inputs, p)
+function derivatives = derive(states, inputs, p)
     % I is the inertia matrix
     I = [p.Ixx 0 0;
          0 p.Iyy 0;

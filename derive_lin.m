@@ -1,4 +1,4 @@
-function derivatives_linearized = fcn(states, inputs, parameters)
+function derivatives_linearized = derive_lin(states, inputs, parameters)
 
     % Angles (roll, pitch, yaw) are small, approx 0
     % sin(x) = x, cos(x) = x 
