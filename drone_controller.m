@@ -9,7 +9,7 @@ Q = eye(12); % Cost function weighing states
 R = ones(4,1); % Cost function weighing inputs
 N = 0; % Optional cross term matrix
 
-[K, S, P] = lqr(sys, Q, R, N);
+[K, S, P] = lqr(A, B, Q, R, N);
 
 G1sfu = ss(A-B*K,B,-K,0); % TF: Reference input to control input
 
