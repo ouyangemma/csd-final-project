@@ -7,5 +7,3 @@ N = 0; % Optional cross term matrix
 
 [K, S, P] = lqr(p.A_lin, p.B_lin, Q, R, N);
 
-
-
