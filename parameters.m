@@ -44,3 +44,20 @@ p.B_lin = [0 0 0 0;
          0 0 1/p.Iyy 0;
          0 0 0 1/p.Izz;
          ];
+
+% Reference Input
+
+x = 0;
+y = 0;
+z = 2;
+x_d = 0;
+y_d = 0;
+z_d = 0;
+phi = 0;
+theta = 0;
+psi = 0;
+phi_d = 0;
+theta_d = 0;
+psi_d = 0;
+
+p.ref = [x;y;z;x_d;y_d;z_d;phi;theta;psi;phi_d;theta_d;psi_d];
