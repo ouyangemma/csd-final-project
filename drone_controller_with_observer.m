@@ -21,8 +21,9 @@ Qw = 0.01 * eye(12);
 
 Qw = Qw + 1e-9 * eye(size(Qw));
 
-Rv = 0.01 * eye(12);
+Rv = 0.01 * eye(6);
 
-L = lqr(p.A_lin', C', eye(12), eye(6))';
+% L = lqr(p.A_lin', C', eye(12), eye(6))';
+L = lqr(p.A_lin', C', Qw, Rv)';
 
-eig(p.A_lin-L*C) 
+%eig(p.A_lin-L*C) 

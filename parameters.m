@@ -55,9 +55,9 @@ F(4:6, 7:9) = eye(3);
 
 % Reference Input
 
-x = 0;
-y = 0;
-z = 2;
+x = 1;
+y = 2;
+z = 3;
 x_d = 0;
 y_d = 0;
 z_d = 0;
