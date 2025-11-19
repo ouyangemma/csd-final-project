@@ -1,5 +1,3 @@
-
-
 % LQR
 
 Q = eye(12); % Cost function weighing states
@@ -23,7 +21,15 @@ Qw = Qw + 1e-9 * eye(size(Qw));
 
 Rv = 0.01 * eye(6);
 
-% L = lqr(p.A_lin', C', eye(12), eye(6))';
 L = lqr(p.A_lin', C', Qw, Rv)';
 
-%eig(p.A_lin-L*C) 
+%%
+
+Ak = p.A_lin-L * p.C_obsv-p.B_lin * K;
+Bk = L;
+Ck = K;
+Dk = 0;
+sysK = ss(Ak,Bk,Ck,Dk);
+
+opt = c2dOptions('Method','tustin','ThiranOrder',3);
+sysd1 = c2d(sysK,1,opt);

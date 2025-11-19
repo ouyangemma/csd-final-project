@@ -1,5 +1,5 @@
 function derivatives = derive(states, inputs, p)
-    % I is the inertia matrix
+     % I is the inertia matrix
     I = [p.Ixx 0 0;
          0 p.Iyy 0;
          0 0 p.Izz];
@@ -24,9 +24,9 @@ function derivatives = derive(states, inputs, p)
 
     % Calculative derivatives of xid
     xidd = [0;0;-p.g] - (p.kD/p.m)*xid + ...
-        [s_roll*s_yaw + c_roll*s_pitch*c_yaw;
+        ([s_roll*s_yaw + c_roll*s_pitch*c_yaw;
          c_roll*s_pitch*s_yaw - s_roll*c_yaw;
-         c_roll*c_pitch]*inputs(1);
+         c_roll*c_pitch]*inputs(1))*1/p.m; % Dividing by m here
 
 
     % Derivative of eta is etad
@@ -35,7 +35,7 @@ function derivatives = derive(states, inputs, p)
 
     % eta is [phi, theta, psi] = roll pitch yaw
     W = [1  0       -s_pitch;
-         0  c_roll  s_phi * c_pitch;
+         0  c_roll  s_roll * c_pitch;
          0 -s_roll  c_roll * c_pitch];
     % v is rpy in body frame
     
@@ -43,12 +43,30 @@ function derivatives = derive(states, inputs, p)
                 inputs(3);
                 inputs(4)];
     v = W * etad;
-    vd = inv(I) * (tau_body + [(p.Iyy - Izz)*v(2)*v(3); ... 
-                               (p.Izz - Ixx)*v(1)*v(3);
-                               (p.Ixx - Iyy)*v(1)*v(2)]);
+    vd = inv(I) * (tau_body + [(p.Iyy - p.Izz)*v(2)*v(3); ... 
+                               (p.Izz - p.Ixx)*v(1)*v(3);
+                               (p.Ixx - p.Iyy)*v(1)*v(2)]);
     Wd = [0        0                  -etad(2)*cos(-etad(2));
           0 -etad(1)*s_roll            etad(1)*c_roll*c_pitch;
-          0 -etad(1)*c_roll -etad(roll)*s_roll*c_pitch-etad(2)*c_roll*s_pitch];
-    etadd = inv(W) * (vd - Wd*etad);
+          0 -etad(1)*c_roll -etad(1)*s_roll*c_pitch-etad(2)*c_roll*s_pitch];
+    etadd = inv(W) * (vd - Wd*etad)
     derivatives = [xid; xidd; etad; etadd];
+
+
+    A = [0 0 0  1 0 0  0 0 0  0 0 0;
+         0 0 0  0 1 0  0 0 0  0 0 0;
+         0 0 0  0 0 1  0 0 0  0 0 0;
+
+         0 0 0  -p.kD/p.m 0 0  0 0 0  0 0 0;
+         0 0 0  0 -p.kD/p.m 0  0 0 0  0 0 0;
+         0 0 0  0 0 -p.kD/p.m  0 0 0  0 0 0;
+
+         0 0 0  0 0 0  0 0 0  1 0 0;
+         0 0 0  0 0 0  0 0 0  0 1 0;
+         0 0 0  0 0 0  0 0 0  0 0 1;
+
+         0 0 0  0 1 0  0 0 0  0 0 0;
+         0 0 0  0 1 0  0 0 0  0 0 0;
+         0 0 0  0 1 0  0 0 0  0 0 0;
+         ];
 end
